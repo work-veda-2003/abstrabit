@@ -7,9 +7,8 @@ export async function createClient() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
 
-    // Fallback/Early return if env vars are missing or invalid
+    // Safe fallback check
     if (!supabaseUrl || !supabaseUrl.startsWith("http") || !supabaseKey) {
-        console.warn("Supabase server client using placeholder. Check env vars!")
         return createServerClient(
             "https://placeholder-project.supabase.co",
             "placeholder-key",
@@ -27,6 +26,12 @@ export async function createClient() {
             supabaseUrl,
             supabaseKey,
             {
+                cookieOptions: {
+                    name: 'sb-auth-token',
+                    path: '/',
+                    sameSite: 'lax',
+                    secure: process.env.NODE_ENV === 'production',
+                },
                 cookies: {
                     getAll() {
                         return cookieStore.getAll()
@@ -36,7 +41,8 @@ export async function createClient() {
                             cookiesToSet.forEach(({ name, value, options }) =>
                                 cookieStore.set(name, value, options)
                             )
-                        } catch {
+                        } catch (error) {
+                            // The `setAll` method was called from a Server Component.
                             // This can be ignored if you have middleware refreshing
                             // user sessions.
                         }
@@ -47,7 +53,7 @@ export async function createClient() {
     } catch (e) {
         console.error("Error creating Supabase server client:", e)
         return createServerClient(
-            "https://placeholder.supabase.co",
+            "https://placeholder-project.supabase.co",
             "placeholder-key",
             {
                 cookies: {
