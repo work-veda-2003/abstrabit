@@ -31,5 +31,11 @@ Implemented the modern **Proof Key for Code Exchange (PKCE)** login flow:
 - **PostgreSQL Row Level Security (RLS)**: Engineered the database schema to ensure data isolation. Users can only perform `SELECT`, `INSERT`, and `DELETE` operations on rows where `user_id = auth.uid()`.
 - **Dynamic Headers**: Used `next/headers` cookies properly to ensure authentication is verified on every server-side request.
 
+## 6. Multi-User Scaling & Cache Management
+To ensure the application scales to many users without data leakage or stale UI issues:
+- **Cache Avoidance**: Explicitly set `revalidate = 0` and `force-dynamic` on the main entry points. This prevents Next.js from caching one user's dashboard and showing it to another (Global Cache collision).
+- **Session Isolation**: Every request to the Supabase client recreates the user context server-side using the specific visitor's cookies.
+- **Connection Pooling**: (Infrastructure level) Supabase/Vercel handles the heavy lifting of PostgreSQL connection pooling to prevent database exhaustion as the user base grows.
+
 ## Summary
 The engineering focus was on **"Silent Failure" prevention**. By ensuring the application is defensive against its own configuration state, we achieved a production deployment that remains stable while the developer fine-tunes Supabase and Google Cloud settings.

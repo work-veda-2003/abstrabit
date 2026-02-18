@@ -3,6 +3,7 @@ import { LoginView } from "@/components/login-view"
 import { DashboardView } from "@/components/dashboard-view"
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function Home() {
   try {
