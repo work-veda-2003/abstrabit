@@ -117,8 +117,23 @@ export function DashboardView({ user }: { user: any }) {
     }
 
     const handleDelete = async (id: string) => {
+        // Save the bookmark in case we need to revert
+        const bookmarkToRestore = bookmarks.find(b => b.id === id)
+        if (!bookmarkToRestore) return
+
+        // Optimistically remove from UI
+        setBookmarks((prev) => prev.filter((b) => b.id !== id))
+
         const { error } = await supabase.from("bookmarks").delete().eq("id", id)
-        if (error) console.error("Error deleting bookmark:", error)
+
+        if (error) {
+            console.error("Error deleting bookmark:", error)
+            // Restore if delete failed
+            setBookmarks((prev) => [bookmarkToRestore, ...prev].sort((a, b) =>
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            ))
+            alert("Failed to delete bookmark. Please try again.")
+        }
     }
 
     const getDomain = (url: string) => {

@@ -1,5 +1,6 @@
 # Abstrabit: Technical Approach & Production Strategy
 
+
 This document outlines the engineering decisions and implementation strategy used to bring **Abstrabit** from concept to a production-ready, high-performance bookmark manager.
 
 ## 1. Core Architecture
