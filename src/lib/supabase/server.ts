@@ -9,7 +9,6 @@ export async function createClient() {
 
     // Fallback/Early return if env vars are missing to prevent crash
     if (!supabaseUrl || !supabaseKey) {
-        console.error("Supabase environment variables are missing.")
         return createServerClient(
             "https://placeholder.supabase.co",
             "placeholder-key",
@@ -22,26 +21,39 @@ export async function createClient() {
         )
     }
 
-    return createServerClient(
-        supabaseUrl,
-        supabaseKey,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll()
+    try {
+        return createServerClient(
+            supabaseUrl,
+            supabaseKey,
+            {
+                cookies: {
+                    getAll() {
+                        return cookieStore.getAll()
+                    },
+                    setAll(cookiesToSet) {
+                        try {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                cookieStore.set(name, value, options)
+                            )
+                        } catch {
+                            // This can be ignored if you have middleware refreshing
+                            // user sessions.
+                        }
+                    },
                 },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // The `setAll` method was called from a Server Component.
-                        // This can be ignored if you have middleware refreshing
-                        // user sessions.
-                    }
-                },
-            },
-        }
-    )
+            }
+        )
+    } catch (e) {
+        console.error("Error creating Supabase server client:", e)
+        return createServerClient(
+            "https://placeholder.supabase.co",
+            "placeholder-key",
+            {
+                cookies: {
+                    getAll() { return [] },
+                    setAll() { }
+                }
+            }
+        )
+    }
 }
