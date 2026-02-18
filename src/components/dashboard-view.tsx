@@ -70,18 +70,32 @@ export function DashboardView({ user }: { user: any }) {
         e.preventDefault()
         if (!newTitle || !newUrl) return
 
-        setAdding(true)
-        const { error } = await supabase.from("bookmarks").insert({
+        const optimisticBookmark: Bookmark = {
+            id: crypto.randomUUID(),
+            created_at: new Date().toISOString(),
             title: newTitle,
             url: newUrl,
+            user_id: user.id
+        }
+
+        // Optimistically update the UI
+        setBookmarks((prev) => [optimisticBookmark, ...prev])
+        setNewTitle("")
+        setNewUrl("")
+
+        setAdding(true)
+        const { error } = await supabase.from("bookmarks").insert({
+            title: optimisticBookmark.title,
+            url: optimisticBookmark.url,
             user_id: user.id
         })
 
         if (error) {
             console.error("Error adding bookmark:", error)
-        } else {
-            setNewTitle("")
-            setNewUrl("")
+            // Revert the optimistic update on error
+            setBookmarks((prev) => prev.filter(b => b.id !== optimisticBookmark.id))
+            setNewTitle(optimisticBookmark.title)
+            setNewUrl(optimisticBookmark.url)
         }
         setAdding(false)
     }
