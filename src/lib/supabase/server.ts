@@ -4,13 +4,13 @@ import { cookies } from 'next/headers'
 export async function createClient() {
     const cookieStore = await cookies()
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
 
-    // Fallback/Early return if env vars are missing to prevent crash
-    if (!supabaseUrl || !supabaseKey) {
+    // Fallback/Early return if env vars are missing or invalid
+    if (!supabaseUrl || !supabaseUrl.startsWith("http") || !supabaseKey) {
         return createServerClient(
-            "https://placeholder.supabase.co",
+            "https://placeholder-project.supabase.co",
             "placeholder-key",
             {
                 cookies: {
