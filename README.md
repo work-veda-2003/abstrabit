@@ -1,85 +1,44 @@
-# Abstrabit
+# Abstrabit 🌌
 
-A minimal, depth-focused bookmark manager.
+Abstrabit is a clean, minimal, and fast bookmark manager built for developers who hate clutter. It uses a "glassmorphic" design to make your links feel like they are floating in space.
 
-## Features
+## 🛠 Why I Built This (and the problems I solved)
 
-- **Google Authentication**: Seamless sign-in.
-- **Real-time Updates**: Bookmarks sync instantly across devices.
-- **Private Space**: Your bookmarks are yours alone.
-- **Minimal Design**: Focused on content, with subtle depth and glassmorphism.
+Building this wasn't just about putting links on a screen. I ran into real technical walls and had to find smart ways around them. Here is the "human" version of the engineering journey:
 
-## Tech Stack
+### 1. The "Invisible" Server Crash
+**The Problem**: When I first deployed to Vercel, the whole site crashed with a "Server Component Error." This happened because Vercel was trying to build the site before the Supabase keys were ready, and the code didn't know how to handle "missing" values.
+**The Fix**: I rewrote the Supabase connection logic to be "defensive." I added checks that say: *"If the keys aren't here yet, don't crash the whole site; just show a safe fallback."* I also forced the app to render "dynamically" so it wouldn't get confused about user cookies during the build process.
 
-- **Next.js 15** (App Router)
-- **Supabase** (Auth, Database, Realtime)
-- **Tailwind CSS** (Styling)
-- **Framer Motion** (Animations)
+### 2. The "Handshake" Fail (Auth PKCE)
+**The Problem**: Google Login would work on my computer but fail on my phone. It kept saying "PKCE code verifier not found." This is basically like the phone and the server speaking two different languages and losing the "security' key during the handshake.
+**The Fix**: I found out that the Browser and the Server were using slightly different names for their security cookies. I manually synchronized the cookie settings (Name, Path, and Security level) in both the `client.ts` and `server.ts` files. This made the handshake 100% reliable.
 
-## Setup Guide
+### 3. The "Double Entry" Bug
+**The Problem**: On mobile, when you added a bookmark, it would appear twice for a second, then go back to one. This happened because my "Optimistic Update" (making the UI feel fast) was fighting with the "Real-time Sync" (getting live data from the database).
+**The Fix**: I synchronized the IDs. Now, the phone generates the ID *before* sending it to the database. When the database sends the message back saying "Hey, I have a new link," the phone checks the ID and says: *"I already have this one on the screen, ignore it."* No more double entries!
 
-### 1. Supabase Setup
+### 4. The Hover Trap
+**The Problem**: I designed a clean UI where the "Delete" button appeared when you hovered your mouse. It looked great on PC, but on a phone, there is no "hover." Users couldn't delete anything!
+**The Fix**: I implemented smart device detection. Now, on phones, the delete button is always visible and has a larger "touch target" (so you don't miss it), but on PC, it stays hidden until you hover to keep things looking clean.
 
-1. Create a new project at [supabase.com](https://supabase.com).
-2. Go to **Authentication -> Providers** and enable **Google**.
-   - You will need to set up a Google Cloud Project to get the `Client ID` and `Client Secret`.
-   - Add the Supabase generic callback URL to your Google Credentials (authorized redirect URIs).
-3. Go to **SQL Editor** and run the following query to set up the database:
+---
 
-```sql
--- Create bookmarks table
-create table bookmarks (
-  id uuid default gen_random_uuid() primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  title text not null,
-  url text not null,
-  user_id uuid references auth.users not null
-);
+## 🏗 Tech Stack
+- **Next.js 15**: For the lightning-fast speed.
+- **Supabase**: For the real-time database and secure login.
+- **Tailwind CSS v4**: For the beautiful glassmorphic design.
+- **Framer Motion**: For those smooth, "buttery" animations.
 
--- Enable Row Level Security
-alter table bookmarks enable row level security;
+## 🚀 Speed-Run Setup
 
--- Create Policies
-create policy "Individuals can create bookmarks." on bookmarks for
-    insert with check (auth.uid() = user_id);
+1. **Clone & Install**: `npm install`
+2. **Database**: Create a `bookmarks` table in Supabase with `id`, `title`, `url`, and `user_id`. (Don't forget to enable RLS so users can't see each other's links!)
+3. **Environment**: Add your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to an `.env.local` file.
+4. **Go Live**: `npm run dev`
 
-create policy "Individuals can view their own bookmarks. " on bookmarks for
-    select using (auth.uid() = user_id);
+---
 
-create policy "Individuals can update their own bookmarks." on bookmarks for
-    update using (auth.uid() = user_id);
-
-create policy "Individuals can delete their own bookmarks." on bookmarks for
-    delete using (auth.uid() = user_id);
-
--- Enable Realtime
-alter publication supabase_realtime add table bookmarks;
-```
-
-### 2. Environment Variables
-
-Create a file named `.env.local` in the root (or configure in Vercel):
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### 3. Run Locally
-
-```bash
-npm install
-npm run dev
-```
-
-### 4. Deploy to Vercel
-
-1. Push this code to GitHub.
-2. Import the project in Vercel.
-3. Add the environment variables in Vercel settings.
-4. Deploy.
-
-## Design Philosophy
-
-"Depth, Creativity, Minimalism."
-The UI uses a dark, "void-like" background with subtle glassmorphism to create a sense of depth. Interactions are smooth and meaningful.
+## 💡 Design Philosophy
+*"Depth over Distraction."* 
+Everything in Abstrabit is designed to feel calm. From the dark void background to the subtle shadows on the cards, the goal is to help you focus on your links, not the UI.
