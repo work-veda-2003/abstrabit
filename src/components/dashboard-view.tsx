@@ -51,7 +51,12 @@ export function DashboardView({ user }: { user: any }) {
                 },
                 (payload) => {
                     if (payload.eventType === "INSERT") {
-                        setBookmarks((prev) => [payload.new as Bookmark, ...prev])
+                        const newBookmark = payload.new as Bookmark
+                        setBookmarks((prev) => {
+                            // Check if it already exists (to avoid double entry from optimistic updates)
+                            if (prev.some(b => b.id === newBookmark.id)) return prev
+                            return [newBookmark, ...prev]
+                        })
                     } else if (payload.eventType === "DELETE") {
                         setBookmarks((prev) => prev.filter((b) => b.id !== (payload.old as { id: string }).id))
                     } else if (payload.eventType === "UPDATE") {
@@ -94,6 +99,7 @@ export function DashboardView({ user }: { user: any }) {
 
         setAdding(true)
         const { error } = await supabase.from("bookmarks").insert({
+            id: optimisticBookmark.id, // Pass the same ID to the database
             title: optimisticBookmark.title,
             url: optimisticBookmark.url,
             user_id: user.id
