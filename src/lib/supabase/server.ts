@@ -9,6 +9,7 @@ export async function createClient() {
 
     // Fallback/Early return if env vars are missing or invalid
     if (!supabaseUrl || !supabaseUrl.startsWith("http") || !supabaseKey) {
+        console.warn("Supabase server client using placeholder. Check env vars!")
         return createServerClient(
             "https://placeholder-project.supabase.co",
             "placeholder-key",

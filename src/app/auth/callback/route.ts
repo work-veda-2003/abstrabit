@@ -14,17 +14,23 @@ export async function GET(request: Request) {
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+            const forwardedHost = request.headers.get('x-forwarded-host')
             const isLocalEnv = process.env.NODE_ENV === 'development'
+
+            let targetUrl = origin;
             if (isLocalEnv) {
-                // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-                return NextResponse.redirect(`${origin}${next}`)
+                targetUrl = origin;
             } else if (forwardedHost) {
-                return NextResponse.redirect(`https://${forwardedHost}${next}`)
-            } else {
-                return NextResponse.redirect(`${origin}${next}`)
+                targetUrl = `https://${forwardedHost}`;
             }
+
+            console.log("Auth success, redirecting to:", `${targetUrl}${next}`)
+            return NextResponse.redirect(`${targetUrl}${next}`)
+        } else {
+            console.error("Auth exchange error:", error)
         }
+    } else {
+        console.warn("Auth callback hit without code")
     }
 
     // return the user to an error page with instructions
