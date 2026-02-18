@@ -7,7 +7,7 @@ export default async function Home() {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }))
 
   if (!user) {
     return <LoginView />
