@@ -29,6 +29,7 @@ export function DashboardView({ user }: { user: any }) {
             const { data, error } = await supabase
                 .from("bookmarks")
                 .select("*")
+                .eq("user_id", user.id) // Strict isolation filter
                 .order("created_at", { ascending: false })
 
             if (error) console.error("Error fetching bookmarks:", error)
