@@ -70,6 +70,15 @@ export function DashboardView({ user }: { user: any }) {
         e.preventDefault()
         if (!newTitle || !newUrl) return
 
+        // Normalize URL for duplicate checking
+        const normalizedUrl = newUrl.trim().toLowerCase()
+        const isDuplicate = bookmarks.some(b => b.url.trim().toLowerCase() === normalizedUrl)
+
+        if (isDuplicate) {
+            alert("This bookmark already exists in your collection.")
+            return
+        }
+
         const optimisticBookmark: Bookmark = {
             id: crypto.randomUUID(),
             created_at: new Date().toISOString(),
@@ -119,16 +128,16 @@ export function DashboardView({ user }: { user: any }) {
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6 space-y-8 min-h-screen">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 min-h-screen">
             <header className="flex items-center justify-between py-6">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-80" />
-                    <h1 className="text-2xl font-light tracking-tight text-white/90">
+                    <h1 className="text-xl sm:text-2xl font-light tracking-tight text-white/90">
                         Abstrabit
                     </h1>
                 </div>
-                <div className="flex items-center gap-4">
-                    <span className="text-xs font-mono text-white/30 hidden sm:block">{user.email}</span>
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <span className="text-[10px] sm:text-xs font-mono text-white/30 truncate max-w-[100px] sm:max-w-none">{user.email}</span>
                     <Button
                         onClick={handleSignOut}
                         className="bg-transparent hover:bg-white/5 text-white/50 hover:text-white border-0 h-8 w-8 p-0"
@@ -138,9 +147,9 @@ export function DashboardView({ user }: { user: any }) {
                 </div>
             </header>
 
-            <div className="glass-panel p-1 rounded-2xl flex flex-col sm:flex-row gap-2 items-center relative overflow-hidden">
+            <div className="glass-panel p-1 rounded-2xl flex flex-col md:flex-row gap-0 md:gap-2 items-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent pointer-events-none" />
-                <div className="flex-1 w-full relative group">
+                <div className="flex-1 w-full relative group border-b border-white/5 md:border-b-0">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-white/50 transition-colors">
                         <span className="text-xs font-medium">T</span>
                     </div>
@@ -148,10 +157,10 @@ export function DashboardView({ user }: { user: any }) {
                         placeholder="Title"
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
-                        className="border-0 bg-transparent focus:bg-transparent pl-8 h-12 text-base placeholder:text-white/20"
+                        className="border-0 bg-transparent focus:bg-transparent pl-8 h-12 text-sm sm:text-base placeholder:text-white/20"
                     />
                 </div>
-                <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                <div className="w-px h-8 bg-white/10 hidden md:block" />
                 <div className="flex-1 w-full relative group">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-white/50 transition-colors">
                         <LinkIcon className="w-3 h-3" />
@@ -160,13 +169,13 @@ export function DashboardView({ user }: { user: any }) {
                         placeholder="https://"
                         value={newUrl}
                         onChange={(e) => setNewUrl(e.target.value)}
-                        className="border-0 bg-transparent focus:bg-transparent pl-8 h-12 text-base font-mono text-xs placeholder:text-white/20"
+                        className="border-0 bg-transparent focus:bg-transparent pl-8 h-12 text-sm sm:text-base font-mono placeholder:text-white/20"
                     />
                 </div>
                 <Button
                     onClick={handleAddBookmark}
                     disabled={adding || !newTitle || !newUrl}
-                    className="m-1 bg-white/10 hover:bg-white/20 text-white border-0 rounded-xl h-10 px-6 transition-all"
+                    className="m-2 md:m-1 w-[95%] md:w-auto bg-white/10 hover:bg-white/20 text-white border-0 rounded-xl h-10 px-6 transition-all"
                 >
                     {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 </Button>
@@ -187,7 +196,7 @@ export function DashboardView({ user }: { user: any }) {
                         <p className="text-sm text-white/10">Add depth to your collection.</p>
                     </motion.div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-12">
                         <AnimatePresence mode="popLayout">
                             {bookmarks.map((bookmark) => (
                                 <motion.div
