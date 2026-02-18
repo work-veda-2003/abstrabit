@@ -215,15 +215,15 @@ export function DashboardView({ user }: { user: any }) {
                                     transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                                     className="group relative glass-panel p-0 rounded-xl hover:bg-white/10 transition-all hover:shadow-2xl hover:shadow-indigo-500/10"
                                 >
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                    <div className="absolute top-2 right-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10">
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleDelete(bookmark.id);
                                             }}
-                                            className="p-2 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-full transition-all"
+                                            className="p-2.5 text-white/30 hover:text-red-400 hover:bg-red-400/10 rounded-full transition-all"
                                         >
-                                            <Trash2 className="w-3 h-3" />
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
 
