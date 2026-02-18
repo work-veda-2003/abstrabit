@@ -28,9 +28,11 @@ export async function GET(request: Request) {
             return NextResponse.redirect(`${targetUrl}${next}`)
         } else {
             console.error("Auth exchange error:", error)
+            return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(error.message)}`)
         }
     } else {
         console.warn("Auth callback hit without code")
+        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=No+code+received+from+Google`)
     }
 
     // return the user to an error page with instructions
