@@ -13,11 +13,11 @@ export default function AuthCodeError() {
                 </div>
 
                 <div className="pt-4">
-                    <Button asChild className="w-full h-12 glass-button">
-                        <Link href="/">
+                    <Link href="/">
+                        <Button className="w-full h-12 glass-button">
                             Return to Login
-                        </Link>
-                    </Button>
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>
