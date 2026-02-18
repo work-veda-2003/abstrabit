@@ -230,14 +230,14 @@ export function DashboardView({ user }: { user: any }) {
                                     transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                                     className="group relative glass-panel p-0 rounded-xl hover:bg-white/10 transition-all hover:shadow-2xl hover:shadow-indigo-500/10"
                                 >
-                                    <div className="absolute top-3 right-3 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 z-20">
+                                    <div className="absolute top-3 right-3 opacity-100 transition-all duration-200 z-20">
                                         <button
                                             onClick={(e) => {
                                                 e.preventDefault(); // Stop the link from opening
                                                 e.stopPropagation(); // Stop the event from bubbling
                                                 handleDelete(bookmark.id);
                                             }}
-                                            className="p-2.5 bg-background/80 backdrop-blur-md text-white/40 hover:text-red-400 hover:bg-red-400/20 rounded-full border border-white/5 transition-all shadow-lg"
+                                            className="p-2.5 bg-white/5 hover:bg-red-400/20 backdrop-blur-md text-white/40 hover:text-red-400 rounded-full border border-white/10 transition-all shadow-lg"
                                             title="Delete Bookmark"
                                         >
                                             <Trash2 className="w-4 h-4" />
